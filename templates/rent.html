@@ -1,0 +1,90 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="form-shell">
+    <div class="form-head">
+      <span class="eyebrow light">RENTAL REQUEST</span>
+      <h1>{{ vehicle.make_model }}</h1>
+      <p>📍 {{ vehicle.location }} · {{ vehicle.price_per_day|money }}/day · 👥 {{ vehicle.passenger_capacity }}</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="p-3 p-md-4">
+      <div class="notice">
+        <b>System-calculated payment:</b> the rental total comes from the selected dates and the reservation payment is fixed at 20%.
+      </div>
+
+      <h4 class="mt-4">Verified account</h4>
+      <div class="row g-2">
+        <div class="col-md-6"><input class="form-control" value="{{ customer.full_name }}" disabled></div>
+        <div class="col-md-6"><input class="form-control" value="{{ customer.email }}" disabled></div>
+        <div class="col-md-6">
+          <label>Phone number</label>
+          <input name="phone" class="form-control" value="{{ customer.phone }}" required>
+        </div>
+        <div class="col-md-6">
+          <label>Driver's license number</label>
+          <input name="drivers_license_number" class="form-control" value="{{ customer.drivers_license_number or '' }}" required>
+        </div>
+      </div>
+
+      <h4 class="mt-4">Driver's license card</h4>
+      <div class="license-capture-card">
+        <div>
+          <b>Capture or upload the physical driver's license</b>
+          <p class="small text-secondary mb-2">On a phone, this can open the rear camera. JPG, PNG, or WEBP only.</p>
+        </div>
+        <input name="drivers_license_image" type="file" accept="image/*" capture="environment" class="form-control">
+        {% if customer.drivers_license_image %}
+        <small class="text-success d-block mt-2">A previous license image is already on file. Upload again only if it changed.</small>
+        {% endif %}
+      </div>
+
+      <h4 class="mt-4">Permanent address</h4>
+      <div class="address-group" data-prefix="permanent" data-current-region="{{ customer.permanent_region or '' }}" data-current-province="{{ customer.permanent_province or '' }}" data-current-city="{{ customer.permanent_city or '' }}" data-current-barangay="{{ customer.permanent_barangay or '' }}">
+        <div class="row g-2">
+          <div class="col-md-6"><label>Region</label><select name="permanent_region" class="form-select address-region" required><option value="">Loading regions...</option></select></div>
+          <div class="col-md-6"><label>Province</label><select name="permanent_province" class="form-select address-province" required><option value="">Select region first</option></select></div>
+          <div class="col-md-6"><label>City / Municipality</label><select name="permanent_city" class="form-select address-city" required><option value="">Select province first</option></select></div>
+          <div class="col-md-6"><label>Barangay</label><select name="permanent_barangay" class="form-select address-barangay" required><option value="">Select city first</option></select></div>
+          <div class="col-12"><label>House / Unit / Street / Subdivision</label><input name="permanent_street" class="form-control" value="{{ customer.permanent_street or '' }}" required></div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-4">
+        <h4 class="mb-0">Current / staying address</h4>
+        <button type="button" id="copyPermanentAddress" class="btn btn-sm btn-outline-secondary">Same as permanent</button>
+      </div>
+      <div class="address-group mt-2" data-prefix="staying" data-current-region="{{ customer.staying_region or '' }}" data-current-province="{{ customer.staying_province or '' }}" data-current-city="{{ customer.staying_city or '' }}" data-current-barangay="{{ customer.staying_barangay or '' }}">
+        <div class="row g-2">
+          <div class="col-md-6"><label>Region</label><select name="staying_region" class="form-select address-region" required><option value="">Loading regions...</option></select></div>
+          <div class="col-md-6"><label>Province</label><select name="staying_province" class="form-select address-province" required><option value="">Select region first</option></select></div>
+          <div class="col-md-6"><label>City / Municipality</label><select name="staying_city" class="form-select address-city" required><option value="">Select province first</option></select></div>
+          <div class="col-md-6"><label>Barangay</label><select name="staying_barangay" class="form-select address-barangay" required><option value="">Select city first</option></select></div>
+          <div class="col-12"><label>House / Unit / Street / Subdivision</label><input name="staying_street" class="form-control" value="{{ customer.staying_street or '' }}" required></div>
+        </div>
+      </div>
+
+      <h4 class="mt-4">Rental schedule</h4>
+      <div class="row g-2">
+        <div class="col-md-6"><label>Rental start</label><input name="start_at" type="datetime-local" class="form-control" required></div>
+        <div class="col-md-6"><label>End of rent</label><input name="end_at" type="datetime-local" class="form-control" required></div>
+        <div class="col-12">
+          <label>Vehicle drop-off / delivery location</label>
+          <select name="dropoff_location" class="form-select" required>
+            <option value="">Choose a location</option>
+            {% for loc in rental_locations %}
+            <option value="{{ loc.location_name }}">{{ loc.location_name }}{% if loc.location_address %} — {{ loc.location_address }}{% endif %}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <button class="btn btn-red btn-lg w-100 mt-4">Submit Rental Request</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static',filename='js/ph_address.js') }}"></script>
+{% endblock %}

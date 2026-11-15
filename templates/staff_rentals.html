@@ -1,0 +1,83 @@
+
+{% extends "staff_base.html" %}
+{% block content %}
+<span class="eyebrow">RENTAL OPERATIONS</span>
+<h1>Rentals</h1>
+
+<div class="table-wrap">
+<table class="table align-middle">
+  <thead>
+    <tr>
+      <th>Reference</th>
+      <th>Customer / License</th>
+      <th>Vehicle</th>
+      <th>Schedule / Delivery</th>
+      <th>Address Verification</th>
+      <th>Amount</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for r in rentals %}
+    <tr>
+      <td><b>{{ r.rental_reference }}</b></td>
+      <td>
+        <b>{{ r.full_name }}</b><br>
+        <small>{{ r.email }}<br>{{ r.phone }}</small>
+        <hr class="my-1">
+        <small>License: {{ r.drivers_license_number_snapshot }}</small><br>
+        <a class="small" target="_blank" href="{{ url_for('static',filename=r.drivers_license_image_snapshot) }}">View captured license card</a>
+      </td>
+      <td>{{ r.make_model }}<br><small>📍 {{ r.location }}</small></td>
+      <td>
+        {{ r.start_at }} → {{ r.end_at }}<br>
+        <small>Drop-off: {{ r.dropoff_location }}</small>
+      </td>
+      <td style="min-width:220px">
+        <small><b>Permanent</b><br>{{ r.permanent_address_snapshot }}</small>
+        <hr class="my-1">
+        <small><b>Staying</b><br>{{ r.staying_address_snapshot }}</small>
+      </td>
+      <td>{{ r.total_amount|money }}<br><small>Balance {{ r.balance_due|money }}</small></td>
+      <td>
+        {{ r.status }}
+        {% if r.return_rating_submitted %}
+        <br><small class="text-success">✓ Rating received</small>
+        {% endif %}
+      </td>
+      <td style="min-width:220px">
+        {% if session.role in ['agent','manager','owner'] and r.status=='Pending Verification' %}
+        <form method="post" action="{{ url_for('verify_rental',rental_id=r.rental_id) }}" class="d-flex gap-1 mb-2">
+          <button class="btn btn-sm btn-success" name="action" value="approve">Approve</button>
+          <button class="btn btn-sm btn-outline-danger" name="action" value="decline">Decline</button>
+        </form>
+        {% endif %}
+
+        {% if session.role in ['agent','manager','owner'] and r.status not in ['Cancelled','Completed'] %}
+        <form method="post" action="{{ url_for('rental_payment',rental_id=r.rental_id) }}" class="mb-2">
+          <select name="payment_type" class="form-select form-select-sm mb-1">
+            <option>Reservation</option><option>Final</option>
+          </select>
+          <select name="payment_method" class="form-select form-select-sm mb-1">
+            <option>Cash</option><option>GCash</option><option>Bank Transfer</option><option>Card</option>
+          </select>
+          <button class="btn btn-sm btn-dark w-100">Record System Payment</button>
+        </form>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('update_rental_status',rental_id=r.rental_id) }}">
+          <select name="status" class="form-select form-select-sm mb-1">
+            {% for s in ['Reserved','Ready for Drop-Off','Active','Return Review Required','Ready for Return Inspection','Completed','Cancelled'] %}
+            <option {% if r.status==s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn btn-sm btn-red w-100">Update Status</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

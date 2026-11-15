@@ -1,0 +1,69 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <span class="eyebrow">OUR FLEET</span>
+  <h1>Find your vehicle</h1>
+  <p class="text-secondary">Cars and motorcycles are handled from the filters, so the main navigation stays simple.</p>
+
+  <form class="filter-card row g-2 mb-4">
+    <div class="col-12 col-lg-3"><input name="q" value="{{ q }}" class="form-control" placeholder="Model or category"></div>
+    <div class="col-6 col-lg-2">
+      <select name="type" class="form-select">
+        <option value="">All types</option>
+        <option {% if vehicle_type=='Car' %}selected{% endif %}>Car</option>
+        <option {% if vehicle_type=='Motorcycle' %}selected{% endif %}>Motorcycle</option>
+      </select>
+    </div>
+    <div class="col-6 col-lg-3">
+      <select name="location" class="form-select">
+        <option value="">All locations</option>
+        {% for l in locations %}<option {% if location==l %}selected{% endif %}>{{ l }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-2">
+      <select name="capacity" class="form-select">
+        <option value="">Any capacity</option>
+        {% for n in [2,4,5,7,10] %}
+        <option value="{{ n }}" {% if capacity==n|string %}selected{% endif %}>{{ n }}+ people</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-lg-2 d-grid"><button class="btn btn-red">Filter</button></div>
+  </form>
+
+  <div class="row g-3">
+    {% for v in vehicles %}
+    <div class="col-sm-6 col-xl-4">
+      <div class="vehicle-card h-100">
+        <div class="vehicle-image large">
+          <img src="{{ v.image_url }}">
+          {% if session.get('customer_id') %}
+          <form method="post" action="{{ url_for('like_vehicle',vehicle_id=v.vehicle_id) }}" class="like-form">
+            <button class="like-btn {% if v.liked %}liked{% endif %}">♥</button>
+          </form>
+          {% endif %}
+          <span class="status">{{ v.status }}</span>
+        </div>
+        <div class="p-3">
+          <div class="location">📍 {{ v.location }}</div>
+          <h3>{{ v.make_model }}</h3>
+          <div class="meta">
+            <span>{{ v.category }}</span>
+            <span>👥 {{ v.passenger_capacity }}</span>
+            <span>{{ v.fuel_type }}</span>
+            <span>{{ v.transmission }}</span>
+          </div>
+          <p class="small text-secondary mt-2">{{ v.description }}</p>
+          <div class="small text-secondary">★ {{ '%.1f'|format(v.avg_rating or 0) }} · Rented {{ v.rental_count }}× · ♥ {{ v.likes }}</div>
+          <div class="price">{{ v.price_per_day|money }} <small>/ day</small></div>
+          <a class="btn btn-outline-red w-100 mt-2" href="{{ url_for('vehicle_detail',vehicle_id=v.vehicle_id) }}">View Details</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12"><div class="empty-card">No vehicles found.</div></div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

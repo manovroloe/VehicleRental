@@ -1,0 +1,65 @@
+
+{% extends "staff_base.html" %}
+{% block content %}
+<span class="eyebrow">SERVICE OPERATIONS</span>
+<h1>Maintenance & Cleaning Logs</h1>
+<p class="text-secondary">Work performed uses fixed selections for consistent reporting.</p>
+
+<div class="staff-card mb-4">
+  <form method="post" class="row g-2" id="serviceLogForm">
+    <div class="col-md-3">
+      <label>Vehicle</label>
+      <select name="vehicle_id" class="form-select" required>
+        {% for v in vehicles %}<option value="{{ v.vehicle_id }}">{{ v.make_model }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label>Service type</label>
+      <select name="service_type" id="serviceType" class="form-select" required>
+        {% for service_type in SERVICE_TASKS.keys() %}<option value="{{ service_type }}">{{ service_type }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label>Work performed / usage</label>
+      <select name="details" id="serviceTask" class="form-select" required></select>
+    </div>
+    <div class="col-md-2">
+      <label>Cost</label>
+      <input name="cost" type="number" min="0" step="0.01" class="form-control" value="0">
+    </div>
+    <div class="col-md-2">
+      <label>Evidence URL</label>
+      <input name="evidence_url" class="form-control" placeholder="Optional">
+    </div>
+    <div class="col-12">
+      <label>Optional notes</label>
+      <input name="notes" class="form-control" placeholder="Only add notes when needed">
+    </div>
+    <div class="col-12"><button class="btn btn-red">Submit Service Log</button></div>
+  </form>
+</div>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Date</th><th>Vehicle</th><th>Staff</th><th>Type</th><th>Work Performed</th><th>Cost</th></tr></thead>
+    <tbody>
+      {% for l in logs %}
+      <tr><td>{{ l.created_at }}</td><td>{{ l.make_model }}</td><td>{{ l.full_name }}</td><td>{{ l.service_type }}</td><td>{{ l.details }}</td><td>{{ l.cost|money }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const serviceTasks = {{ SERVICE_TASKS|tojson }};
+const serviceType = document.getElementById("serviceType");
+const serviceTask = document.getElementById("serviceTask");
+function loadServiceTasks(){
+  const tasks = serviceTasks[serviceType.value] || [];
+  serviceTask.innerHTML = tasks.map(task => `<option value="${task}">${task}</option>`).join("");
+}
+serviceType.addEventListener("change", loadServiceTasks);
+loadServiceTasks();
+</script>
+{% endblock %}

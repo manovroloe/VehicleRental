@@ -1,0 +1,24 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="login-box">
+    <span class="eyebrow">CUSTOMER REGISTRATION</span>
+    <h1>Create account</h1>
+    <p class="text-secondary">Your email must be verified before you can like, inquire, or rent.</p>
+    <form method="post">
+      <label>Full name</label>
+      <input name="full_name" class="form-control mb-3" required>
+      <label>Gmail / Email</label>
+      <input name="email" type="email" class="form-control mb-3" required>
+      <label>Phone number</label>
+      <input name="phone" class="form-control mb-3" required>
+      <label>Password</label>
+      <input name="password" type="password" minlength="6" class="form-control mb-3" required>
+      <button class="btn btn-red w-100">Create & Send Verification Code</button>
+    </form>
+    <hr>
+    <p class="small mb-0">Already registered? <a href="{{ url_for('customer_login') }}">Log in</a></p>
+  </div>
+</div>
+{% endblock %}

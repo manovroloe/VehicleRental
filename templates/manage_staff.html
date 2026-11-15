@@ -1,0 +1,67 @@
+
+{% extends "staff_base.html" %}
+{% block content %}
+<span class="eyebrow">OWNER CONTROL</span>
+<h1>Staff Management</h1>
+<p class="text-secondary">Add, disable, or restore employees. Staff profile images are stored with their accounts.</p>
+
+<div class="row g-4">
+  <div class="col-xl-4">
+    <div class="staff-card">
+      <h4>Add Staff</h4>
+      <form method="post" enctype="multipart/form-data">
+        <input name="full_name" class="form-control mb-2" placeholder="Full name" required>
+        <input name="email" type="email" class="form-control mb-2" placeholder="Email / Gmail" required>
+        <input name="phone" class="form-control mb-2" placeholder="Phone" required>
+        <select name="role" class="form-select mb-2" required>
+          {% for key,label in STAFF_ROLES.items() %}
+            {% if key!='owner' %}<option value="{{ key }}">{{ label }}</option>{% endif %}
+          {% endfor %}
+        </select>
+        <input name="base_wage" type="number" step="0.01" class="form-control mb-2" placeholder="Base wage" required>
+        <input name="password" type="password" minlength="6" class="form-control mb-2" placeholder="Temporary password" required>
+        <label class="small fw-semibold">Profile image</label>
+        <input name="profile_image" type="file" accept="image/*" class="form-control mb-3">
+        <button class="btn btn-red w-100">Add Staff Account</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-xl-8">
+    <div class="row g-3">
+      {% for s in staff_rows %}
+      <div class="col-md-6">
+        <div class="staff-card staff-person-card h-100">
+          <div class="d-flex gap-3">
+            {% if s.profile_image %}
+            <img src="{{ url_for('static',filename=s.profile_image) }}" class="staff-profile-image">
+            {% else %}
+            <div class="staff-profile-image fallback">{{ s.full_name[0] }}</div>
+            {% endif %}
+            <div class="flex-grow-1">
+              <h5 class="mb-1">{{ s.full_name }}</h5>
+              <div class="small text-secondary">{{ STAFF_ROLES[s.role] }}</div>
+              <div class="small">{{ s.email }}</div>
+              <div class="small">{{ s.phone }}</div>
+              <div class="mt-2"><b>{{ s.base_wage|money }}</b> base wage</div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <span class="badge {% if s.is_active %}text-bg-success{% else %}text-bg-secondary{% endif %}">
+              {% if s.is_active %}Active{% else %}Disabled{% endif %}
+            </span>
+            {% if s.staff_id != session.staff_id %}
+            <form method="post" action="{{ url_for('toggle_staff',staff_id=s.staff_id) }}">
+              <button class="btn btn-sm {% if s.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                {% if s.is_active %}Remove / Disable{% else %}Restore{% endif %}
+              </button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

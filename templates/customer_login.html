@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="login-box">
+    <span class="eyebrow">CUSTOMER ACCESS</span>
+    <h1>Log in</h1>
+    <p class="text-secondary">Your password is checked first, then a verification code is sent to your Gmail/email.</p>
+    <form method="post">
+      <label>Email / Gmail</label>
+      <input name="email" type="email" class="form-control mb-3" required>
+      <label>Password</label>
+      <input name="password" type="password" class="form-control mb-3" required>
+      <button class="btn btn-red w-100">Continue to Email Verification</button>
+    </form>
+    <hr>
+    <p class="small mb-0">No account yet? <a href="{{ url_for('customer_register') }}">Create customer account</a></p>
+    <p class="small text-secondary mt-2 mb-0">Demo: customer@redline.test / customer123</p>
+  </div>
+</div>
+{% endblock %}

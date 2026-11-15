@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="form-shell small-shell">
+    <div class="form-head">
+      <span class="eyebrow light">INQUIRY</span>
+      <h1>Ask about {{ vehicle.make_model }}</h1>
+      <p>Agent replies will be sent directly to {{ customer.email }}.</p>
+    </div>
+    <form method="post" class="p-4">
+      <label>Subject</label>
+      <input name="subject" class="form-control mb-3" required>
+      <label>Your question</label>
+      <textarea name="message" class="form-control mb-3" rows="6" required></textarea>
+      <div class="notice mb-3">Your contact details come from your verified customer account.</div>
+      <button class="btn btn-red w-100">Send Inquiry to Agent</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

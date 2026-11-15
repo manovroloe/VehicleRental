@@ -1,0 +1,56 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-7"><div class="detail-image"><img src="{{ vehicle.image_url }}"></div></div>
+    <div class="col-lg-5">
+      <div class="detail-card">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="status static">{{ vehicle.status }}</span>
+          {% if session.get('customer_id') %}
+          <form method="post" action="{{ url_for('like_vehicle',vehicle_id=vehicle.vehicle_id) }}">
+            <button class="like-btn {% if vehicle.liked %}liked{% endif %}">♥</button>
+          </form>
+          {% endif %}
+        </div>
+        <div class="location mt-3">📍 {{ vehicle.location }}</div>
+        <h1>{{ vehicle.make_model }}</h1>
+        <p>{{ vehicle.vehicle_type }} · {{ vehicle.category }} · {{ vehicle.plate_number }}</p>
+        <div class="spec-grid">
+          <div><b>👥 {{ vehicle.passenger_capacity }}</b><small>Passengers</small></div>
+          <div><b>{{ vehicle.transmission }}</b><small>Transmission</small></div>
+          <div><b>{{ vehicle.fuel_type }}</b><small>Fuel</small></div>
+          <div><b>{{ vehicle.rental_count }}×</b><small>Times rented</small></div>
+        </div>
+        <p>{{ vehicle.description }}</p>
+        <div class="price big">{{ vehicle.price_per_day|money }} <small>/ day</small></div>
+
+        {% if session.get('customer_id') %}
+          <a class="btn btn-red btn-lg w-100 mt-3 {% if vehicle.status!='Available' %}disabled{% endif %}"
+             href="{{ url_for('rent',vehicle_id=vehicle.vehicle_id) }}">Rent This Vehicle</a>
+          <a class="btn btn-outline-red btn-lg w-100 mt-2"
+             href="{{ url_for('inquiry_new',vehicle_id=vehicle.vehicle_id) }}">Ask an Agent</a>
+        {% else %}
+          <div class="browse-only-box mt-4">
+            <b>Browse-only mode</b>
+            <p class="mb-2">Log in to like this vehicle, ask an agent, or submit a rental request.</p>
+            <a class="btn btn-red w-100" href="{{ url_for('customer_login') }}">Log In to Continue</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-5">
+  <h2>Customer ratings</h2>
+  {% for r in reviews %}
+  <div class="review-card">
+    <b>{{ r.full_name }}</b> <span class="text-warning">{{ '★' * r.rating }}</span>
+    <p class="mb-0">{{ r.comment or 'No written comment.' }}</p>
+  </div>
+  {% else %}
+  <p>No reviews yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

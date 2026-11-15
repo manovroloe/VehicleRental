@@ -1,0 +1,12 @@
+
+# Local secrets, database exports, and uploads
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.csv
+*.sql
+*.zip
+/static/uploads/

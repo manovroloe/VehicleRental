@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="login-box text-center">
+    <span class="eyebrow">EMAIL AUTHENTICATION</span>
+    <h1>{{ title }}</h1>
+    <p class="text-secondary">Enter the 6-digit code sent to your Gmail/email account. The code expires in 10 minutes.</p>
+    <form method="post">
+      <input name="otp" inputmode="numeric" maxlength="6" pattern="[0-9]{6}"
+             class="form-control form-control-lg text-center otp-input mb-3"
+             placeholder="000000" required>
+      <button class="btn btn-red w-100">Verify Code</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <div class="account-hero">
+    <div>
+      <span class="eyebrow light">CUSTOMER ACCOUNT</span>
+      <h1>{{ customer.full_name }}</h1>
+      <p>{{ customer.email }} · {{ customer.phone }}</p>
+    </div>
+    <a class="btn btn-light" href="{{ url_for('vehicles') }}">Browse Vehicles</a>
+  </div>
+
+  <div class="section-head mt-4">
+    <div><span class="eyebrow">LIKED VEHICLES</span><h2>Your favorites</h2></div>
+  </div>
+  <div class="row g-3">
+    {% for v in liked %}
+    <div class="col-sm-6 col-xl-3">
+      <div class="vehicle-card h-100">
+        <div class="vehicle-image"><img src="{{ v.image_url }}"></div>
+        <div class="p-3">
+          <div class="location">📍 {{ v.location }}</div>
+          <h3>{{ v.make_model }}</h3>
+          <div class="price">{{ v.price_per_day|money }} <small>/ day</small></div>
+          <div class="d-grid gap-2 mt-2">
+            <a class="btn btn-outline-red" href="{{ url_for('vehicle_detail',vehicle_id=v.vehicle_id) }}">View</a>
+            <form method="post" action="{{ url_for('like_vehicle',vehicle_id=v.vehicle_id) }}">
+              <button class="btn btn-red w-100">♥ Liked</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12"><div class="empty-card">You have no liked vehicles yet.</div></div>
+    {% endfor %}
+  </div>
+
+  <div class="section-head mt-5">
+    <div><span class="eyebrow">RENTALS</span><h2>Your rental activity</h2></div>
+  </div>
+  <div class="table-wrap">
+    <table class="table align-middle">
+      <thead><tr><th>Reference</th><th>Vehicle</th><th>Schedule</th><th>Location</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for r in rentals %}
+      <tr>
+        <td>{{ r.rental_reference }}</td>
+        <td>{{ r.make_model }}</td>
+        <td>{{ r.start_at }} → {{ r.end_at }}</td>
+        <td>{{ r.dropoff_location }}</td>
+        <td>{{ r.total_amount|money }}</td>
+        <td>{{ r.status }}</td>
+        <td><a class="btn btn-sm btn-outline-red" href="{{ url_for('rental_status',reference=r.rental_reference) }}">Open</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="text-center text-secondary">No rentals yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head mt-5">
+    <div><span class="eyebrow">INQUIRIES</span><h2>Agent inquiry status</h2></div>
+  </div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Code</th><th>Vehicle</th><th>Subject</th><th>Status</th><th>Agent Replies</th></tr></thead>
+      <tbody>
+      {% for i in inquiries %}
+      <tr>
+        <td>{{ i.inquiry_code }}</td>
+        <td>{{ i.make_model }}</td>
+        <td>{{ i.subject }}</td>
+        <td>{{ i.status }}</td>
+        <td><span class="small text-secondary">Replies are delivered to {{ customer.email }}</span></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-secondary">No inquiries yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

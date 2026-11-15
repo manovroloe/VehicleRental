@@ -1,0 +1,80 @@
+
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="container py-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-7">
+        <span class="eyebrow">CARS • SUVS • VANS • MOTORCYCLES</span>
+        <h1>Rent the right vehicle.<br><span>Move without limits.</span></h1>
+        <p>Browse vehicle prices, passenger capacity, locations, rental counts, ratings, and live availability. Log in when you are ready to like, inquire, or rent.</p>
+        <form action="{{ url_for('vehicles') }}" class="hero-search row g-2">
+          <div class="col-md-5">
+            <select name="location" class="form-select">
+              <option value="">Choose location</option>
+              {% for l in locations %}<option>{{ l }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <select name="type" class="form-select">
+              <option value="">Cars & motorcycles</option>
+              <option>Car</option>
+              <option>Motorcycle</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-grid"><button class="btn btn-red">Browse Vehicles</button></div>
+        </form>
+        <div class="mt-3 small">✓ Browse without an account &nbsp; ✓ Verified customer actions &nbsp; ✓ Agent support by email</div>
+      </div>
+      <div class="col-lg-5">
+        <div class="hero-panel">
+          <h3>Clear rental process</h3>
+          <div class="mini-grid">
+            <div><b>20%</b><small>Fixed reservation payment</small></div>
+            <div><b>Email OTP</b><small>Customer authentication</small></div>
+            <div><b>Agent</b><small>Replies sent to Gmail/email</small></div>
+            <div><b>1–5★</b><small>Required return rating</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="section-head">
+    <div><span class="eyebrow">POPULAR</span><h2>Frequently rented</h2></div>
+    <a href="{{ url_for('vehicles') }}">View all →</a>
+  </div>
+
+  <div class="row g-3">
+    {% for v in vehicles %}
+    <div class="col-sm-6 col-xl-3">
+      <div class="vehicle-card h-100">
+        <div class="vehicle-image">
+          <img src="{{ v.image_url }}">
+          {% if session.get('customer_id') %}
+          <form method="post" action="{{ url_for('like_vehicle',vehicle_id=v.vehicle_id) }}" class="like-form">
+            <button class="like-btn {% if v.liked %}liked{% endif %}">♥</button>
+          </form>
+          {% endif %}
+          <span class="status">{{ v.status }}</span>
+        </div>
+        <div class="p-3">
+          <div class="location">📍 {{ v.location }}</div>
+          <h3>{{ v.make_model }}</h3>
+          <div class="meta">
+            <span>{{ v.vehicle_type }}</span>
+            <span>👥 {{ v.passenger_capacity }}</span>
+            <span>{{ v.transmission }}</span>
+          </div>
+          <div class="small text-secondary mt-2">★ {{ '%.1f'|format(v.avg_rating or 0) }} · Rented {{ v.rental_count }}× · ♥ {{ v.likes }}</div>
+          <div class="price">{{ v.price_per_day|money }} <small>/ day</small></div>
+          <a class="btn btn-outline-red w-100 mt-2" href="{{ url_for('vehicle_detail',vehicle_id=v.vehicle_id) }}">View Vehicle</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
